@@ -35,8 +35,9 @@ class Weather:
         self.ui.show()
 
     def create_env_button_action(self):
-        self.model.create_cloud_bank()
         self.model.create_sky()
+        self.model.create_cloud_bank()
+        self.model.create_rain()
 
     def clouds_density_action(self, value):
         self.model.set_cloud_density(value)
@@ -46,6 +47,9 @@ class Weather:
 
     def clouds_aod_action(self, value):
         self.model.set_details_amount(value)
+
+    def rain_enabled_action(self, is_enabled):
+        self.model.enable_rain(is_enabled)
 
 
 # Initialize the plug-in

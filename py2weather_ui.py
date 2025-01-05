@@ -96,8 +96,18 @@ class WeatherUI(QWidget):
         font.setBold(True)
         title_label.setFont(font)
 
-        # @todo Rain UI
+        # Rain enabled checkbox
+        rain_enabled_layout = QHBoxLayout()
+        rain_enabled_label = QLabel(self, text='Enable Rain')
+        rain_enabled_checkbox = QCheckBox(self)
+        rain_enabled_checkbox.stateChanged.connect(self.controller.rain_enabled_action)
+        rain_enabled_layout.addWidget(rain_enabled_label)
+        rain_enabled_layout.addStretch()
+        rain_enabled_layout.addWidget(rain_enabled_checkbox)
+
+        # @todo Add wind stuff
 
         rain_layout.addWidget(title_label)
         rain_layout.addWidget(separator)
+        rain_layout.addLayout(rain_enabled_layout)
         self.main_layout.addLayout(rain_layout)
