@@ -12,15 +12,16 @@ except:
     from PySide6.QtWidgets import *
     from shiboken6 import wrapInstance
 
-# Import import stuff
+# Manually reloading modules to prevent caching and
+# not having to reopen Autodesk Maya
 import importlib
 import sys
-
-# Reload the modules explicitly preventing caching
 if 'py2weather_ui' in sys.modules:
     importlib.reload(sys.modules['py2weather_ui'])
 if 'py2weather_model' in sys.modules:
     importlib.reload(sys.modules['py2weather_model'])
+if 'py2weather_utils' in sys.modules:
+    importlib.reload(sys.modules['py2weather_utils'])
 
 from py2weather_ui import WeatherUI
 from py2weather_model import WeatherModel
@@ -65,7 +66,7 @@ def initializePlugin(mobject):
 
     global plugin_instance
     plugin_instance = Weather(maya_main_window)
-    om.MGlobal.displayInfo("Weather plug-in loaded successfully.")
+    om.MGlobal.displayInfo("[WC] Weather Controller plug-in loaded successfully.")
 
 
 # Uninitialize the plug-in
@@ -74,4 +75,4 @@ def uninitializePlugin(mobject):
     if plugin_instance:
         plugin_instance.ui.close()
         plugin_instance = None
-    om.MGlobal.displayInfo("Weather UI plug-in unloaded successfully.")
+    om.MGlobal.displayInfo("[WC] Weather Controller plug-in unloaded successfully.")

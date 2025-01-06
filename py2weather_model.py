@@ -2,13 +2,6 @@ import maya.cmds as cmds
 import maya.mel as mel
 import numpy as np
 
-PLUGIN_NAME = 'WC'
-GROUP_NAME = 'g_WeatherController'
-CLOUD_OBJECT_NAME = 'WC::CloudContainer'
-
-def log(message):
-    print(f'[{PLUGIN_NAME}]: {message}')
-
 class WeatherModel:
     def __init__(self):
         # Debug only
@@ -98,23 +91,21 @@ class WeatherModel:
         self.rain_particles = cmds.nParticle(name='WC:RainParticles')
         cmds.connectDynamic(self.rain_particles, em=self.rain_emitter)
 
-        # Get the shape node of the nParticle
+        # Get reference to nParticle shape node
         self.rain_particles_shape = cmds.listRelatives(self.rain_particles, shapes=True)[0]
 
         # Get a reference to the nucleus solver
         self.nucleus_solver = cmds.listConnections(self.rain_particles, type='nucleus')[0]
         self.nucleus_solver = cmds.rename(self.nucleus_solver, 'WC:Nucleus')
 
-        # Create an expression to link textureOrigin.z with nucleus.windSpeed over time
-        #wind_direction = cmds.getAttr(f'{self.nucleus_solver}.windDirection')[0]
-        #wind_direction = np.array(wind_direction)
-        #wind_direction[1] = 0 # Projecting to the XZ plane
-        #wind_direction = wind_direction / np.linalg.norm(wind_direction) # Normalizing the vector
-
-        # Opposite sign to translate them correctly with the axis
+        # Create an expression to link textureOrigin with nucleus.windSpeed to move clouds
+        # NOTE:
+        # - opposite sign to translate them correctly with the axis
+        # - scaling factor of 0.01 @todo Adjust
         expression = f"""
-            {self.cloud_container_shape}.textureOriginX = - frame * ({self.nucleus_solver}.windSpeed * {self.nucleus_solver}.windDirectionX * 0.01);
-            {self.cloud_container_shape}.textureOriginZ = - frame * ({self.nucleus_solver}.windSpeed * {self.nucleus_solver}.windDirectionZ * 0.01);
+            {self.cloud_container_shape}.textureOriginX = - time * ({self.nucleus_solver}.windSpeed * {self.nucleus_solver}.windDirectionX * 0.01);
+            {self.cloud_container_shape}.textureOriginY = - time * ({self.nucleus_solver}.windSpeed * {self.nucleus_solver}.windDirectionY * 0.01);
+            {self.cloud_container_shape}.textureOriginZ = - time * ({self.nucleus_solver}.windSpeed * {self.nucleus_solver}.windDirectionZ * 0.01);
         """
         cmds.expression(name="WC:cloudMovementExpression", string=expression, alwaysEvaluate=True)
 
@@ -123,6 +114,7 @@ class WeatherModel:
         cmds.setAttr(f'{self.rain_particles_shape}.lifespan', 1.5)
 
         # Create and assign rain material
+        # @todo Prevent creation of multiple m_Rain materials
         rain_material = cmds.shadingNode('aiStandardSurface', asShader=True, name='m_Rain')
         cmds.select(self.rain_particles)
         cmds.hyperShade(assign=rain_material)
@@ -137,7 +129,6 @@ class WeatherModel:
 
     def set_cloud_density(self, value):
         normalized_value = value / 100
-        # Changing opacityInputBias between 0 and 0.6
         cmds.setAttr(f'{self.cloud_container_shape}.opacityInputBias', normalized_value * 0.6)
 
     def set_storminess(self, is_toggled):
@@ -160,5 +151,22 @@ class WeatherModel:
         cmds.setAttr(f'{self.nucleus_solver}.windSpeed', value)
 
     def set_wind_direction(self, value, axis):
-        #log(value + ' ' + axis)
-        cmds.setAttr(f'{self.nucleus_solver}.windDirection{axis}', value)
+        # Get previous values from the nucleus
+        wind_direction = cmds.getAttr(f'{self.nucleus_solver}.windDirection')[0]
+        wind_direction = np.array(wind_direction)
+
+        # Update values locally
+        if axis == 'X':
+            wind_direction[0] = value
+        elif axis == 'Y':
+            wind_direction[1] = value
+        elif axis == 'Z':
+            wind_direction[2] = value
+
+        # wind_direction[1] = 0 # Projecting to the XZ plane
+        wind_direction = wind_direction / np.linalg.norm(wind_direction) # Normalizing the vector
+
+        # Update values on the nucleus
+        cmds.setAttr(f'{self.nucleus_solver}.windDirectionX', wind_direction[0])
+        cmds.setAttr(f'{self.nucleus_solver}.windDirectionY', wind_direction[1])
+        cmds.setAttr(f'{self.nucleus_solver}.windDirectionZ', wind_direction[2])
