@@ -1,5 +1,6 @@
 import maya.cmds as cmds
 import maya.mel as mel
+import numpy as np
 
 PLUGIN_NAME = 'WC'
 GROUP_NAME = 'g_WeatherController'
@@ -10,11 +11,13 @@ def log(message):
 
 class WeatherModel:
     def __init__(self):
-        # Create plug-in group
-        if not cmds.objExists(GROUP_NAME):
+        # Debug only
+        # Delete group if already present in the outliner
+        if cmds.objExists(GROUP_NAME):
+            cmds.delete(GROUP_NAME)
             self.group = cmds.group(empty=True, name=GROUP_NAME)
         else:
-            self.group = GROUP_NAME
+            self.group = cmds.group(empty=True, name=GROUP_NAME)
 
     def create_sky(self):
         # Skydome
@@ -98,6 +101,23 @@ class WeatherModel:
         # Get the shape node of the nParticle
         self.rain_particles_shape = cmds.listRelatives(self.rain_particles, shapes=True)[0]
 
+        # Get a reference to the nucleus solver
+        self.nucleus_solver = cmds.listConnections(self.rain_particles, type='nucleus')[0]
+        self.nucleus_solver = cmds.rename(self.nucleus_solver, 'WC:Nucleus')
+
+        # Create an expression to link textureOrigin.z with nucleus.windSpeed over time
+        #wind_direction = cmds.getAttr(f'{self.nucleus_solver}.windDirection')[0]
+        #wind_direction = np.array(wind_direction)
+        #wind_direction[1] = 0 # Projecting to the XZ plane
+        #wind_direction = wind_direction / np.linalg.norm(wind_direction) # Normalizing the vector
+
+        # Opposite sign to translate them correctly with the axis
+        expression = f"""
+            {self.cloud_container_shape}.textureOriginX = - frame * ({self.nucleus_solver}.windSpeed * {self.nucleus_solver}.windDirectionX * 0.01);
+            {self.cloud_container_shape}.textureOriginZ = - frame * ({self.nucleus_solver}.windSpeed * {self.nucleus_solver}.windDirectionZ * 0.01);
+        """
+        cmds.expression(name="WC:cloudMovementExpression", string=expression, alwaysEvaluate=True)
+
         # Disable rain by default
         cmds.setAttr(f'{self.rain_particles_shape}.lifespanMode', 1)  # 1 is for constant lifespan mode
         cmds.setAttr(f'{self.rain_particles_shape}.lifespan', 1.5)
@@ -112,6 +132,7 @@ class WeatherModel:
         # Put the rain stuff inside the plugin group
         cmds.parent(self.rain_emitter, self.group)
         cmds.parent(self.rain_particles, self.group)
+        cmds.parent(self.nucleus_solver, self.group)
 
 
     def set_cloud_density(self, value):
@@ -134,3 +155,10 @@ class WeatherModel:
             cmds.setAttr(f'{self.rain_emitter[0]}.rate', 1000)
         else:
             cmds.setAttr(f'{self.rain_emitter[0]}.rate', 0)
+
+    def set_wind_speed(self, value):
+        cmds.setAttr(f'{self.nucleus_solver}.windSpeed', value)
+
+    def set_wind_direction(self, value, axis):
+        #log(value + ' ' + axis)
+        cmds.setAttr(f'{self.nucleus_solver}.windDirection{axis}', value)

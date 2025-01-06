@@ -1,4 +1,5 @@
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QDoubleValidator
 from PySide6.QtWidgets import *
 
 class WeatherUI(QWidget):
@@ -17,6 +18,7 @@ class WeatherUI(QWidget):
         self.build_create_env_ui()
         self.build_clouds_ui()
         self.build_rain_ui()
+        self.build_wind_ui()
 
     def build_create_env_ui(self):
         button = QPushButton('Create Environment', self)
@@ -29,17 +31,7 @@ class WeatherUI(QWidget):
     def build_clouds_ui(self):
         clouds_layout = QVBoxLayout(self)
 
-        # Section separator
-        separator = QFrame(self)
-        separator.setFrameShape(QFrame.HLine)
-        separator.setFrameShadow(QFrame.Sunken)
-
-        # Section title
-        title_label = QLabel(self, text='Clouds', alignment=Qt.AlignCenter)
-        # Make it bold
-        font = title_label.font()
-        font.setBold(True)
-        title_label.setFont(font)
+        self.create_section_header('Clouds', clouds_layout)
 
         # Density
         density_layout = QHBoxLayout()
@@ -73,8 +65,6 @@ class WeatherUI(QWidget):
         aod_layout.addWidget(aod_slider)
 
         # Add sub-HBox in the main cloud VBox
-        clouds_layout.addWidget(separator)
-        clouds_layout.addWidget(title_label)
         clouds_layout.addLayout(density_layout)
         clouds_layout.addLayout(storminess_layout)
         clouds_layout.addLayout(aod_layout)
@@ -84,17 +74,7 @@ class WeatherUI(QWidget):
     def build_rain_ui(self):
         rain_layout = QVBoxLayout(self)
 
-        # Section separator
-        separator = QFrame(self)
-        separator.setFrameShape(QFrame.HLine)
-        separator.setFrameShadow(QFrame.Sunken)
-
-        # Section title
-        title_label = QLabel(self, text='Rain', alignment=Qt.AlignCenter)
-        # Make it bold
-        font = title_label.font()
-        font.setBold(True)
-        title_label.setFont(font)
+        self.create_section_header('Rain', rain_layout)
 
         # Rain enabled checkbox
         rain_enabled_layout = QHBoxLayout()
@@ -105,9 +85,86 @@ class WeatherUI(QWidget):
         rain_enabled_layout.addStretch()
         rain_enabled_layout.addWidget(rain_enabled_checkbox)
 
-        # @todo Add wind stuff
-
-        rain_layout.addWidget(title_label)
-        rain_layout.addWidget(separator)
         rain_layout.addLayout(rain_enabled_layout)
         self.main_layout.addLayout(rain_layout)
+
+    def build_wind_ui(self):
+        wind_layout = QVBoxLayout(self)
+        self.create_section_header('Wind', wind_layout)
+
+        # Wind speed slider
+        speed_layout = QHBoxLayout()
+        speed_label = QLabel(self, text='Wind Speed')
+        speed_slider = QSlider(orientation=Qt.Horizontal, minimum=0, maximum=100, value=0)
+        speed_slider.setMinimumWidth(100)
+        speed_slider.setMaximumWidth(100)
+        speed_slider.valueChanged.connect(self.controller.wind_speed_action)
+        speed_layout.addWidget(speed_label)
+        speed_layout.addStretch()
+        speed_layout.addWidget(speed_slider)
+
+        # Wind direction
+        direction_layout = QHBoxLayout()
+        validator = QDoubleValidator()
+        validator.setRange(-99.999, 99.999) # @todo fix this
+        validator.setDecimals(3)
+        direction_label = QLabel(self, text='Wind Direction')
+
+        # Inputs
+        direction_input_layout = QHBoxLayout()
+
+        # X axis
+        direction_x_input = QLineEdit(self)
+        direction_x_input.setMinimumWidth(50)
+        direction_x_input.setMaximumWidth(50)
+        direction_x_input.setText('1.000')
+        direction_x_input.setValidator(validator)
+
+        # Y axis
+        direction_y_input = QLineEdit(self)
+        direction_y_input.setMinimumWidth(50)
+        direction_y_input.setMaximumWidth(50)
+        direction_y_input.setText('0.000')
+        direction_y_input.setValidator(validator)
+
+        # Z axis
+        direction_z_input = QLineEdit(self)
+        direction_z_input.setMinimumWidth(50)
+        direction_z_input.setMaximumWidth(50)
+        direction_z_input.setText('0.000')
+        direction_z_input.setValidator(validator)
+
+        # Connect inputs
+        direction_x_input.editingFinished.connect(lambda: self.controller.wind_direction_action(float(direction_x_input.text()), 'X'))
+        direction_y_input.editingFinished.connect(lambda: self.controller.wind_direction_action(float(direction_y_input.text()), 'Y'))
+        direction_z_input.editingFinished.connect(lambda: self.controller.wind_direction_action(float(direction_z_input.text()), 'Z'))
+
+        # Nest layouts
+        direction_input_layout.addWidget(direction_x_input)
+        direction_input_layout.addWidget(direction_y_input)
+        direction_input_layout.addWidget(direction_z_input)
+
+        direction_layout.addWidget(direction_label)
+        direction_layout.addStretch()
+        direction_layout.addLayout(direction_input_layout)
+
+        wind_layout.addLayout(speed_layout)
+        wind_layout.addLayout(direction_layout)
+        self.main_layout.addLayout(wind_layout)
+
+    def create_section_header(self, title, layout):
+        # Section separator
+        separator = QFrame(self)
+        separator.setFrameShape(QFrame.HLine)
+        separator.setFrameShadow(QFrame.Sunken)
+
+        # Section title
+        title_label = QLabel(self, text=title, alignment=Qt.AlignCenter)
+        # Make it bold
+        font = title_label.font()
+        font.setBold(True)
+        title_label.setFont(font)
+
+        # Attach to layout
+        layout.addWidget(separator)
+        layout.addWidget(title_label)

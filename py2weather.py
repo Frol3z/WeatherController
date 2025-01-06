@@ -51,6 +51,12 @@ class Weather:
     def rain_enabled_action(self, is_enabled):
         self.model.enable_rain(is_enabled)
 
+    def wind_speed_action(self, value):
+        self.model.set_wind_speed(value)
+
+    def wind_direction_action(self, value, axis):
+        self.model.set_wind_direction(value, axis)
+
 
 # Initialize the plug-in
 def initializePlugin(mobject):
