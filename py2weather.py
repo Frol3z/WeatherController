@@ -16,6 +16,7 @@ except:
 # not having to reopen Autodesk Maya
 import importlib
 import sys
+
 if 'py2weather_ui' in sys.modules:
     importlib.reload(sys.modules['py2weather_ui'])
 if 'py2weather_model' in sys.modules:
@@ -25,6 +26,7 @@ if 'py2weather_utils' in sys.modules:
 
 from py2weather_ui import WeatherUI
 from py2weather_model import WeatherModel
+from py2weather_utils import *
 
 global plugin_instance
 

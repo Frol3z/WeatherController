@@ -2,6 +2,14 @@ import maya.cmds as cmds
 import maya.mel as mel
 import numpy as np
 
+import importlib
+import sys
+
+if 'py2weather_utils' in sys.modules:
+    importlib.reload(sys.modules['py2weather_utils'])
+
+from py2weather_utils import *
+
 class WeatherModel:
     def __init__(self):
         # Debug only
