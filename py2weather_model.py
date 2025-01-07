@@ -106,17 +106,21 @@ class WeatherModel:
         self.nucleus_solver = cmds.listConnections(self.rain_particles, type='nucleus')[0]
         self.nucleus_solver = cmds.rename(self.nucleus_solver, 'WC:Nucleus')
 
+        # Additional attribute to compute deltaTime for animation purposes
+        cmds.addAttr(self.nucleus_solver, longName="lastFrameTime", attributeType="float", defaultValue=0.0)
+
         # Create an expression to link textureOrigin with nucleus.windSpeed to move clouds
         # NOTE:
         # - opposite sign to translate them correctly with the axis
         # - scaling factor of 0.01 @todo Adjust
         expression = f"""
-            float $fps = 30.0;
-            float $deltaTime = 1 / $fps;
+            float $deltaTime = time - {self.nucleus_solver}.lastFrameTime;
             
             {self.cloud_container_shape}.textureOriginX += - $deltaTime * ({self.nucleus_solver}.windSpeed * {self.nucleus_solver}.windDirectionX * 0.01);
             {self.cloud_container_shape}.textureOriginY += - $deltaTime * ({self.nucleus_solver}.windSpeed * {self.nucleus_solver}.windDirectionY * 0.01);
             {self.cloud_container_shape}.textureOriginZ += - $deltaTime * ({self.nucleus_solver}.windSpeed * {self.nucleus_solver}.windDirectionZ * 0.01);
+            
+            {self.nucleus_solver}.lastFrameTime = time;
         """
         cmds.expression(name="WC:cloudMovementExpression", string=expression, alwaysEvaluate=True)
 
@@ -156,6 +160,8 @@ class WeatherModel:
 
     def add_cloud_storminess_keyframe(self):
         cmds.setKeyframe(f'{self.cloud_container_shape}.edgeDropoff')
+        # Set step function to disable interpolation
+        cmds.keyTangent(f'{self.cloud_container_shape}.edgeDropoff', inTangentType="step", outTangentType="step")
 
     def delete_cloud_storminess_keyframe(self):
         cmds.cutKey(f'{self.cloud_container_shape}.edgeDropoff')
