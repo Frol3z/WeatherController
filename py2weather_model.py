@@ -111,9 +111,12 @@ class WeatherModel:
         # - opposite sign to translate them correctly with the axis
         # - scaling factor of 0.01 @todo Adjust
         expression = f"""
-            {self.cloud_container_shape}.textureOriginX = - time * ({self.nucleus_solver}.windSpeed * {self.nucleus_solver}.windDirectionX * 0.01);
-            {self.cloud_container_shape}.textureOriginY = - time * ({self.nucleus_solver}.windSpeed * {self.nucleus_solver}.windDirectionY * 0.01);
-            {self.cloud_container_shape}.textureOriginZ = - time * ({self.nucleus_solver}.windSpeed * {self.nucleus_solver}.windDirectionZ * 0.01);
+            float $fps = 30.0;
+            float $deltaTime = 1 / $fps;
+            
+            {self.cloud_container_shape}.textureOriginX += - $deltaTime * ({self.nucleus_solver}.windSpeed * {self.nucleus_solver}.windDirectionX * 0.01);
+            {self.cloud_container_shape}.textureOriginY += - $deltaTime * ({self.nucleus_solver}.windSpeed * {self.nucleus_solver}.windDirectionY * 0.01);
+            {self.cloud_container_shape}.textureOriginZ += - $deltaTime * ({self.nucleus_solver}.windSpeed * {self.nucleus_solver}.windDirectionZ * 0.01);
         """
         cmds.expression(name="WC:cloudMovementExpression", string=expression, alwaysEvaluate=True)
 
@@ -139,15 +142,33 @@ class WeatherModel:
         normalized_value = value / 100
         cmds.setAttr(f'{self.cloud_container_shape}.opacityInputBias', normalized_value * 0.6)
 
+    def add_cloud_density_keyframe(self):
+        cmds.setKeyframe(f'{self.cloud_container_shape}.opacityInputBias')
+
+    def delete_cloud_density_keyframe(self):
+        cmds.cutKey(f'{self.cloud_container_shape}.opacityInputBias')
+
     def set_storminess(self, is_toggled):
         if is_toggled:
             cmds.setAttr(f'{self.cloud_container_shape}.edgeDropoff', 0.5)
         else:
             cmds.setAttr(f'{self.cloud_container_shape}.edgeDropoff', 0.372)
 
+    def add_cloud_storminess_keyframe(self):
+        cmds.setKeyframe(f'{self.cloud_container_shape}.edgeDropoff')
+
+    def delete_cloud_storminess_keyframe(self):
+        cmds.cutKey(f'{self.cloud_container_shape}.edgeDropoff')
+
     def set_details_amount(self, value):
         normalized_value = value / 100
         cmds.setAttr(f'{self.cloud_container_shape}.frequencyRatio', normalized_value * 3.9 + 0.1)
+
+    def add_cloud_details_keyframe(self):
+        cmds.setKeyframe(f'{self.cloud_container_shape}.frequencyRatio')
+
+    def delete_cloud_details_keyframe(self):
+        cmds.cutKey(f'{self.cloud_container_shape}.frequencyRatio')
 
     def enable_rain(self, is_enabled):
         if is_enabled:
@@ -155,8 +176,20 @@ class WeatherModel:
         else:
             cmds.setAttr(f'{self.rain_emitter[0]}.rate', 0)
 
+    def add_rain_enabled_keyframe(self):
+        cmds.setKeyframe(f'{self.rain_emitter[0]}.rate')
+
+    def delete_rain_enabled_keyframe(self):
+        cmds.cutKey(f'{self.rain_emitter[0]}.rate')
+
     def set_wind_speed(self, value):
         cmds.setAttr(f'{self.nucleus_solver}.windSpeed', value)
+
+    def add_wind_speed_keyframe(self):
+        cmds.setKeyframe(f'{self.nucleus_solver}.windSpeed')
+
+    def delete_wind_speed_keyframe(self):
+        cmds.cutKey(f'{self.nucleus_solver}.windSpeed')
 
     def set_wind_direction(self, value, axis):
         # Get previous values from the nucleus
@@ -178,3 +211,9 @@ class WeatherModel:
         cmds.setAttr(f'{self.nucleus_solver}.windDirectionX', wind_direction[0])
         cmds.setAttr(f'{self.nucleus_solver}.windDirectionY', wind_direction[1])
         cmds.setAttr(f'{self.nucleus_solver}.windDirectionZ', wind_direction[2])
+
+    def add_wind_direction_keyframe(self):
+        cmds.setKeyframe(f'{self.nucleus_solver}.windDirection')
+
+    def delete_wind_direction_keyframe(self):
+        cmds.cutKey(f'{self.nucleus_solver}.windDirection')

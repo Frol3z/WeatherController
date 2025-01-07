@@ -45,20 +45,56 @@ class Weather:
     def clouds_density_action(self, value):
         self.model.set_cloud_density(value)
 
+    def clouds_density_add_keyframe_action(self):
+        self.model.add_cloud_density_keyframe()
+
+    def clouds_density_delete_keyframe_action(self):
+        self.model.delete_cloud_density_keyframe()
+
+    def clouds_storminess_add_keyframe_action(self):
+        self.model.add_cloud_storminess_keyframe()
+
+    def clouds_storminess_delete_keyframe_action(self):
+        self.model.delete_cloud_storminess_keyframe()
+
     def clouds_storminess_action(self, is_toggled):
         self.model.set_storminess(is_toggled)
 
     def clouds_aod_action(self, value):
         self.model.set_details_amount(value)
 
+    def clouds_aod_add_keyframe_action(self):
+        self.model.add_cloud_details_keyframe()
+
+    def clouds_aod_delete_keyframe_action(self):
+        self.model.delete_cloud_details_keyframe()
+
     def rain_enabled_action(self, is_enabled):
         self.model.enable_rain(is_enabled)
+
+    def rain_enabled_add_keyframe_action(self):
+        self.model.add_rain_enabled_keyframe()
+
+    def rain_enabled_delete_keyframe_action(self):
+        self.model.delete_rain_enabled_keyframe()
 
     def wind_speed_action(self, value):
         self.model.set_wind_speed(value)
 
+    def wind_speed_add_keyframe_action(self):
+        self.model.add_wind_speed_keyframe()
+
+    def wind_speed_delete_keyframe_action(self):
+        self.model.delete_wind_speed_keyframe()
+
     def wind_direction_action(self, value, axis):
         self.model.set_wind_direction(value, axis)
+
+    def wind_direction_add_keyframe_action(self):
+        self.model.add_wind_direction_keyframe()
+
+    def wind_direction_delete_keyframe_action(self):
+        self.model.delete_wind_direction_keyframe()
 
 
 # Initialize the plug-in

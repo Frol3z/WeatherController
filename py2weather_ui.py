@@ -33,36 +33,66 @@ class WeatherUI(QWidget):
 
         self.create_section_header('Clouds', clouds_layout)
 
-        # Density
+        # Density sliders
         density_layout = QHBoxLayout()
         density_label = QLabel(self, text='Density')
         density_slider = QSlider(orientation=Qt.Horizontal, minimum=0, maximum=100, value=10)
         density_slider.setMinimumWidth(100)
         density_slider.setMaximumWidth(100)
         density_slider.valueChanged.connect(self.controller.clouds_density_action)
+
+        # Density keyframes
+        density_add_keyframe_button = QPushButton('AK', self)
+        density_delete_keyframe_button = QPushButton('DK', self)
+        density_add_keyframe_button.clicked.connect(self.controller.clouds_density_add_keyframe_action)
+        density_delete_keyframe_button.clicked.connect(self.controller.clouds_density_delete_keyframe_action)
+
+        # Density layout
         density_layout.addWidget(density_label)
         density_layout.addStretch()
         density_layout.addWidget(density_slider)
+        density_layout.addWidget(density_add_keyframe_button)
+        density_layout.addWidget(density_delete_keyframe_button)
 
-        # Storminess
+        # Storminess checkbox
         storminess_layout = QHBoxLayout()
         storminess_label = QLabel(self, text='Storminess')
         storminess_checkbox = QCheckBox(self)
         storminess_checkbox.stateChanged.connect(self.controller.clouds_storminess_action)
+
+        # Storminess keyframes
+        storminess_add_keyframe_button = QPushButton('AK', self)
+        storminess_delete_keyframe_button = QPushButton('DK', self)
+        storminess_add_keyframe_button.clicked.connect(self.controller.clouds_storminess_add_keyframe_action)
+        storminess_delete_keyframe_button.clicked.connect(self.controller.clouds_storminess_delete_keyframe_action)
+
+        # Storminess layout
         storminess_layout.addWidget(storminess_label)
         storminess_layout.addStretch()
         storminess_layout.addWidget(storminess_checkbox)
+        storminess_layout.addWidget(storminess_add_keyframe_button)
+        storminess_layout.addWidget(storminess_delete_keyframe_button)
 
-        # Amount of Details
+        # Amount of Details sliders
         aod_layout = QHBoxLayout()
         aod_label = QLabel(self, text='Amount of Details')
         aod_slider = QSlider(orientation=Qt.Horizontal, minimum=0, maximum=100, value=60)
         aod_slider.setMinimumWidth(100)
         aod_slider.setMaximumWidth(100)
         aod_slider.valueChanged.connect(self.controller.clouds_aod_action)
+
+        # Amount of Details keyframes
+        aod_add_keyframe_button = QPushButton('AK', self)
+        aod_delete_keyframe_button = QPushButton('DK', self)
+        aod_add_keyframe_button.clicked.connect(self.controller.clouds_aod_add_keyframe_action)
+        aod_delete_keyframe_button.clicked.connect(self.controller.clouds_aod_delete_keyframe_action)
+
+        # Amount of Details layout
         aod_layout.addWidget(aod_label)
         aod_layout.addStretch()
         aod_layout.addWidget(aod_slider)
+        aod_layout.addWidget(aod_add_keyframe_button)
+        aod_layout.addWidget(aod_delete_keyframe_button)
 
         # Add sub-HBox in the main cloud VBox
         clouds_layout.addLayout(density_layout)
@@ -81,9 +111,19 @@ class WeatherUI(QWidget):
         rain_enabled_label = QLabel(self, text='Enable Rain')
         rain_enabled_checkbox = QCheckBox(self)
         rain_enabled_checkbox.stateChanged.connect(self.controller.rain_enabled_action)
+
+        # Rain enabled keyframes
+        rain_enabled_add_keyframe_button = QPushButton('AK', self)
+        rain_enabled_delete_keyframe_button = QPushButton('DK', self)
+        rain_enabled_add_keyframe_button.clicked.connect(self.controller.rain_enabled_add_keyframe_action)
+        rain_enabled_delete_keyframe_button.clicked.connect(self.controller.rain_enabled_delete_keyframe_action)
+
+        # Rain enabled layout
         rain_enabled_layout.addWidget(rain_enabled_label)
         rain_enabled_layout.addStretch()
         rain_enabled_layout.addWidget(rain_enabled_checkbox)
+        rain_enabled_layout.addWidget(rain_enabled_add_keyframe_button)
+        rain_enabled_layout.addWidget(rain_enabled_delete_keyframe_button)
 
         rain_layout.addLayout(rain_enabled_layout)
         self.main_layout.addLayout(rain_layout)
@@ -99,9 +139,19 @@ class WeatherUI(QWidget):
         speed_slider.setMinimumWidth(100)
         speed_slider.setMaximumWidth(100)
         speed_slider.valueChanged.connect(self.controller.wind_speed_action)
+
+        # Wind speed keyframes
+        speed_add_keyframe_button = QPushButton(text='AK')
+        speed_add_keyframe_button.clicked.connect(self.controller.wind_speed_add_keyframe_action)
+        speed_delete_keyframe_button = QPushButton(text='DK')
+        speed_delete_keyframe_button.clicked.connect(self.controller.wind_speed_delete_keyframe_action)
+
+        # Wind speed layout
         speed_layout.addWidget(speed_label)
         speed_layout.addStretch()
         speed_layout.addWidget(speed_slider)
+        speed_layout.addWidget(speed_add_keyframe_button)
+        speed_layout.addWidget(speed_delete_keyframe_button)
 
         # Wind direction
         direction_layout = QHBoxLayout()
@@ -139,6 +189,12 @@ class WeatherUI(QWidget):
         direction_y_input.editingFinished.connect(lambda: self.controller.wind_direction_action(float(direction_y_input.text()), 'Y'))
         direction_z_input.editingFinished.connect(lambda: self.controller.wind_direction_action(float(direction_z_input.text()), 'Z'))
 
+        # Wind direction keyframes
+        direction_add_keyframe_button = QPushButton(text='AK')
+        direction_add_keyframe_button.clicked.connect(self.controller.wind_direction_add_keyframe_action)
+        direction_delete_keyframe_button = QPushButton(text='DK')
+        direction_delete_keyframe_button.clicked.connect(self.controller.wind_direction_delete_keyframe_action)
+
         # Nest layouts
         direction_input_layout.addWidget(direction_x_input)
         direction_input_layout.addWidget(direction_y_input)
@@ -147,6 +203,8 @@ class WeatherUI(QWidget):
         direction_layout.addWidget(direction_label)
         direction_layout.addStretch()
         direction_layout.addLayout(direction_input_layout)
+        direction_layout.addWidget(direction_add_keyframe_button)
+        direction_layout.addWidget(direction_delete_keyframe_button)
 
         wind_layout.addLayout(speed_layout)
         wind_layout.addLayout(direction_layout)
