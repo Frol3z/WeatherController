@@ -154,17 +154,19 @@ class WeatherModel:
 
     def set_storminess(self, is_toggled):
         if is_toggled:
-            cmds.setAttr(f'{self.cloud_container_shape}.edgeDropoff', 0.5)
+            cmds.setAttr(f'{self.cloud_container_shape}.edgeDropoff', 0.499)
+            cmds.setAttr(f'{self.cloud_container_shape}.transparency', 0.01, 0.01, 0.01, type="double3")
         else:
             cmds.setAttr(f'{self.cloud_container_shape}.edgeDropoff', 0.372)
+            cmds.setAttr(f'{self.cloud_container_shape}.transparency', 0.25, 0.25, 0.25, type="double3")
 
     def add_cloud_storminess_keyframe(self):
         cmds.setKeyframe(f'{self.cloud_container_shape}.edgeDropoff')
-        # Set step function to disable interpolation
-        cmds.keyTangent(f'{self.cloud_container_shape}.edgeDropoff', inTangentType="step", outTangentType="step")
+        cmds.setKeyframe(f'{self.cloud_container_shape}.transparency')
 
     def delete_cloud_storminess_keyframe(self):
         cmds.cutKey(f'{self.cloud_container_shape}.edgeDropoff')
+        cmds.setKeyframe(f'{self.cloud_container_shape}.transparency')
 
     def set_details_amount(self, value):
         normalized_value = value / 100
@@ -176,11 +178,8 @@ class WeatherModel:
     def delete_cloud_details_keyframe(self):
         cmds.cutKey(f'{self.cloud_container_shape}.frequencyRatio')
 
-    def enable_rain(self, is_enabled):
-        if is_enabled:
-            cmds.setAttr(f'{self.rain_emitter[0]}.rate', 1000)
-        else:
-            cmds.setAttr(f'{self.rain_emitter[0]}.rate', 0)
+    def enable_rain(self, value):
+        cmds.setAttr(f'{self.rain_emitter[0]}.rate', value)
 
     def add_rain_enabled_keyframe(self):
         cmds.setKeyframe(f'{self.rain_emitter[0]}.rate')

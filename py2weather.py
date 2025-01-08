@@ -69,8 +69,8 @@ class Weather:
     def clouds_aod_delete_keyframe_action(self):
         self.model.delete_cloud_details_keyframe()
 
-    def rain_enabled_action(self, is_enabled):
-        self.model.enable_rain(is_enabled)
+    def rain_enabled_action(self, value):
+        self.model.enable_rain(value)
 
     def rain_enabled_add_keyframe_action(self):
         self.model.add_rain_enabled_keyframe()

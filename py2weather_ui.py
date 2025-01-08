@@ -109,8 +109,10 @@ class WeatherUI(QWidget):
         # Rain enabled checkbox
         rain_enabled_layout = QHBoxLayout()
         rain_enabled_label = QLabel(self, text='Enable Rain')
-        rain_enabled_checkbox = QCheckBox(self)
-        rain_enabled_checkbox.stateChanged.connect(self.controller.rain_enabled_action)
+        rain_enabled_slider = QSlider(orientation=Qt.Horizontal, minimum=0, maximum=1000, value=0)
+        rain_enabled_slider.setMinimumWidth(100)
+        rain_enabled_slider.setMaximumWidth(100)
+        rain_enabled_slider.valueChanged.connect(self.controller.rain_enabled_action)
 
         # Rain enabled keyframes
         rain_enabled_add_keyframe_button = QPushButton('AK', self)
@@ -121,7 +123,7 @@ class WeatherUI(QWidget):
         # Rain enabled layout
         rain_enabled_layout.addWidget(rain_enabled_label)
         rain_enabled_layout.addStretch()
-        rain_enabled_layout.addWidget(rain_enabled_checkbox)
+        rain_enabled_layout.addWidget(rain_enabled_slider)
         rain_enabled_layout.addWidget(rain_enabled_add_keyframe_button)
         rain_enabled_layout.addWidget(rain_enabled_delete_keyframe_button)
 
