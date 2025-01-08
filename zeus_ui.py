@@ -1,15 +1,15 @@
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QDoubleValidator
+from PySide6.QtGui import QDoubleValidator, QIcon
 from PySide6.QtWidgets import *
 
-class WeatherUI(QWidget):
+class ZeusUI(QWidget):
     def __init__(self, controller, *args, **kwargs):
-        super(WeatherUI, self).__init__(*args, **kwargs)
+        super(ZeusUI, self).__init__(*args, **kwargs)
         self.controller = controller
         self.setParent(controller.maya_main_window)
         self.setWindowFlags(Qt.Window)
-        self.setObjectName('WeatherUI_uniqueId')
-        self.setWindowTitle('Weather Controller')
+        self.setObjectName('ZeusUI_uniqueId')
+        self.setWindowTitle('Zeus')
         self.setGeometry(50, 50, 350, 150)
         self.build_ui()
 

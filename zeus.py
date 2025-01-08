@@ -13,30 +13,31 @@ except:
     from shiboken6 import wrapInstance
 
 # Manually reloading modules to prevent caching and
-# not having to reopen Autodesk Maya
+# not having to reopen Autodesk Maya everytime
 import importlib
 import sys
 
-if 'py2weather_ui' in sys.modules:
-    importlib.reload(sys.modules['py2weather_ui'])
-if 'py2weather_model' in sys.modules:
-    importlib.reload(sys.modules['py2weather_model'])
-if 'py2weather_utils' in sys.modules:
-    importlib.reload(sys.modules['py2weather_utils'])
+if 'zeus_ui' in sys.modules:
+    importlib.reload(sys.modules['zeus_ui'])
+if 'zeus_model' in sys.modules:
+    importlib.reload(sys.modules['zeus_model'])
+if 'zeus_utils' in sys.modules:
+    importlib.reload(sys.modules['zeus_utils'])
 
-from py2weather_ui import WeatherUI
-from py2weather_model import WeatherModel
-from py2weather_utils import *
+from zeus_ui import ZeusUI
+from zeus_model import ZeusModel
+from zeus_utils import *
 
 global plugin_instance
 
-class Weather:
+class Zeus:
     def __init__(self, maya_main_window):
-        self.model = WeatherModel()
+        self.model = ZeusModel()
         self.maya_main_window = maya_main_window
-        self.ui = WeatherUI(self)
+        self.ui = ZeusUI(self)
         self.ui.show()
 
+    # Create the plugin environment
     def create_env_button_action(self):
         self.model.create_sky()
         self.model.create_cloud_bank()
@@ -58,10 +59,10 @@ class Weather:
         self.model.delete_cloud_storminess_keyframe()
 
     def clouds_storminess_action(self, is_toggled):
-        self.model.set_storminess(is_toggled)
+        self.model.set_cloud_storminess(is_toggled)
 
     def clouds_aod_action(self, value):
-        self.model.set_details_amount(value)
+        self.model.set_cloud_details_amount(value)
 
     def clouds_aod_add_keyframe_action(self):
         self.model.add_cloud_details_keyframe()
@@ -99,18 +100,20 @@ class Weather:
 
 # Initialize the plug-in
 def initializePlugin(mobject):
+    # Get Maya's window pointer
     maya_main_window_ptr = omui.MQtUtil.mainWindow()
     maya_main_window = wrapInstance(int(maya_main_window_ptr), QWidget)
-
+    # Plugin instantiation
     global plugin_instance
-    plugin_instance = Weather(maya_main_window)
-    om.MGlobal.displayInfo("[WC] Weather Controller plug-in loaded successfully.")
+    plugin_instance = Zeus(maya_main_window)
+    om.MGlobal.displayInfo(f'[{PLUGIN_NAME}]: Plugin loaded!')
 
 
 # Uninitialize the plug-in
 def uninitializePlugin(mobject):
     global plugin_instance
+    # Free instance memory
     if plugin_instance:
         plugin_instance.ui.close()
         plugin_instance = None
-    om.MGlobal.displayInfo("[WC] Weather Controller plug-in unloaded successfully.")
+    om.MGlobal.displayInfo(f'[{PLUGIN_NAME}]: Plugin unloaded!')
