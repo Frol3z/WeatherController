@@ -159,13 +159,13 @@ class ZeusModel:
         # Create expression to link textureOrigin with nucleus.windSpeed to move clouds
         # NOTE:
         # - opposite sign to translate them correctly with the axis
-        # - scaling factor of 0.01
+        # - scaling factor of 0.1
         expression = f"""
             float $deltaTime = time - {self.nucleus}.lastFrameTime;
             
-            {self.cloud_container}.textureOriginX += - $deltaTime * ({self.nucleus}.windSpeed * {self.nucleus}.windDirectionX * 0.01);
-            {self.cloud_container}.textureOriginY += - $deltaTime * ({self.nucleus}.windSpeed * {self.nucleus}.windDirectionY * 0.01);
-            {self.cloud_container}.textureOriginZ += - $deltaTime * ({self.nucleus}.windSpeed * {self.nucleus}.windDirectionZ * 0.01);
+            {self.cloud_container}.textureOriginX += - $deltaTime * ({self.nucleus}.windSpeed * {self.nucleus}.windDirectionX * 0.1);
+            {self.cloud_container}.textureOriginY += - $deltaTime * ({self.nucleus}.windSpeed * {self.nucleus}.windDirectionY * 0.1);
+            {self.cloud_container}.textureOriginZ += - $deltaTime * ({self.nucleus}.windSpeed * {self.nucleus}.windDirectionZ * 0.1);
             
             {self.nucleus}.lastFrameTime = time;
         """
