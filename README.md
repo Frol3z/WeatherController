@@ -12,4 +12,4 @@ This is a work in progress Python plugin for Autodesk Maya 2025 to handle clouds
 - add and delete keyframe to handle animations and timelapses
 
 ## Example
-*GIF coming...*
+![timelapse](https://github.com/Frol3z/Zeus/blob/main/timelapse.gif)
