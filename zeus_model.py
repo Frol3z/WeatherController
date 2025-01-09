@@ -89,6 +89,7 @@ class ZeusModel:
 
         # Load custom preset
         mel.eval(f'applyAttrPreset "{cloud_container_shape}" "customClouds" 1')
+
         log(CLOUD_OBJECT_NAME + ' created successfully!')
 
         # Insert in the plugin group
@@ -173,6 +174,7 @@ class ZeusModel:
         # Create and assign rain material
         if not cmds.objExists('m_Rain'):
             rain_material = cmds.shadingNode('aiStandardSurface', asShader=True, name='m_Rain')
+            mel.eval(f'applyAttrPreset "{rain_material}" "customRain" 1')
         else:
             rain_material = 'm_Rain'
 
